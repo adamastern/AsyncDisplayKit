@@ -822,6 +822,10 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 - (void)didCompleteLayoutTransition:(id<ASContextTransitioning>)context
 {
+  ASLayout *toLayout = [context layoutForKey:ASTransitionContextToLayoutKey];
+  if (toLayout != nil) {
+    [self applyLayout: [context layoutForKey:ASTransitionContextToLayoutKey] constrainedSize: [context constrainedSizeForKey:ASTransitionContextToLayoutKey] layoutContext: nil];
+  }
   [_pendingLayoutContext applySubnodeRemovals];
   [self _completeLayoutCalculation];
   _pendingLayoutContext = nil;
@@ -2336,6 +2340,10 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   ASDisplayNodeAssertMainThread();
 
   if (!_flags.isMeasured) {
+    return;
+  }
+  
+  if (_transitionContext != nil) {
     return;
   }
   
